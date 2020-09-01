@@ -2,6 +2,8 @@
     // console.log(Dinos);
 // alert("HELLO WORLD")
     // Create Dino Constructor
+    const tileTypes = ["anklyosaurus", "brachiosaurus", "elasmosaurus", "pteranodon", "human", "tyrannosaurus rex", "stegosaurus", "triceratops", "pigeon"];
+
     let Dinosaur = function(species, weight, height, diet, where, when, fact) {
         this.species = species;
         this.weight = weight;
@@ -52,19 +54,24 @@
 
 
 // On button click, prepare and display infographic
-// document.getElementById("btn").onclick = () => {
-//     console.log("CLICK!")
-//     console.log(getHumanData())
-//     document.getElementById("dino-compare").style.display = "none";
-//     // var text = document.createTextNode("Tutorix is the best e-learning platform");
-//     // tag.appendChild(text);
-//     const gridNode = document.getElementById("grid");
-//     var textnode = document.createTextNode("Water");
-//     const newDiv = document.createElement("div");
-//     const image = document.createElement("img");
-//     image.setAttribute("src", "images/brachiosaurus.png");
-//     newDiv.appendChild(image);
-//     // newDiv.innerHTML = "<img src = 'images/brachiosaurus.png />";
-//     gridNode.appendChild(newDiv);
-// }
+document.getElementById("btn").onclick = () => {
+    // console.log("CLICK!")
+    // console.log(getHumanData())
+
+    // Hide form
+    document.getElementById("dino-compare").style.display = "none";
+
+    tileTypes.forEach((tileType, index) => {
+
+        const description = document.createTextNode(tileType);
+        const newDiv = document.createElement("div");
+        newDiv.setAttribute("class", "grid-item");
+        const image = document.createElement("img");
+        image.setAttribute("src", `images/${tileType}.png`);
+        newDiv.appendChild(image);
+        newDiv.appendChild(description);
+        gridNode.appendChild(newDiv);
+    })
+
+}
 console.log("LOADED!")
