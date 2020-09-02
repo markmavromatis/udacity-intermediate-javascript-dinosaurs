@@ -1,7 +1,5 @@
-// const dinosaurs = require("dino.json");
-    // console.log(Dinos);
-// alert("HELLO WORLD")
-    // Create Dino Constructor
+
+// Create Dino Constructor
     const tileTypes = ["anklyosaurus", "brachiosaurus", "elasmosaurus", "pteranodon", "human", "tyrannosaurus rex", "stegosaurus", "triceratops", "pigeon"];
 
     let Dinosaur = function(species, weight, height, diet, where, when, fact) {
@@ -55,7 +53,7 @@
 
 // On button click, prepare and display infographic
 document.getElementById("btn").onclick = () => {
-    console.log("CLICK!")
+
     // console.log(getHumanData())
     document.getElementById("CloseButton").className="visible";
 
@@ -64,17 +62,20 @@ document.getElementById("btn").onclick = () => {
     document.getElementById("dino-compare").className = "invisible";
     tileTypes.forEach((tileType, index) => {
 
-        const description = document.createTextNode(tileType);
+        const descriptionNode = document.createElement("h3");
+        descriptionNode.innerHTML = tileType;
+        const trivia = getTriviaForTile(tileType);
+        const triviaNode = document.createElement("p");
+        triviaNode.innerHTML = trivia;
         const newDiv = document.createElement("div");
         newDiv.setAttribute("class", "grid-item");
         const image = document.createElement("img");
         image.setAttribute("src", `images/${tileType}.png`);
+        newDiv.appendChild(descriptionNode);
         newDiv.appendChild(image);
-        newDiv.appendChild(description);
+        newDiv.appendChild(triviaNode);
         gridNode.appendChild(newDiv);
     })
-    // const lineBreak = document.createElement("br");
-    // gridNode.appendChild(lineBreak);
 
 }
 
@@ -95,7 +96,16 @@ document.getElementById("CloseButton").onclick = () => {
 }
 
 
-//TODO: Create / implement close button on tiles
 //TODO: Add trivia for dinosaurs
+function getTriviaForTile(species) {
+    if (species == "pigeon") {
+        return "All birds are dinosaurs."
+    } else if (species == "human") {
+        return "Human Name"
+    } else {
+        return "Everybody walk a dinosaur!"
+    }
+}
+
 //TODO: Generate 3 methods to compare dinosaur data with human data
 //TODO: Write logic to render dinosaur trivia
