@@ -55,12 +55,13 @@
 
 // On button click, prepare and display infographic
 document.getElementById("btn").onclick = () => {
-    // console.log("CLICK!")
+    console.log("CLICK!")
     // console.log(getHumanData())
+    document.getElementById("CloseButton").className="visible";
 
     // Hide form
-    document.getElementById("dino-compare").style.display = "none";
-
+    const gridNode = document.getElementById("grid");
+    document.getElementById("dino-compare").className = "invisible";
     tileTypes.forEach((tileType, index) => {
 
         const description = document.createTextNode(tileType);
@@ -72,6 +73,29 @@ document.getElementById("btn").onclick = () => {
         newDiv.appendChild(description);
         gridNode.appendChild(newDiv);
     })
+    // const lineBreak = document.createElement("br");
+    // gridNode.appendChild(lineBreak);
 
 }
-console.log("LOADED!")
+
+
+document.getElementById("CloseButton").onclick = () => {
+
+    // Remove dinosaur tiles
+    const gridNode = document.getElementById("grid");
+    while (gridNode.hasChildNodes()) {
+        gridNode.removeChild(gridNode.childNodes[0]);
+    }
+
+    // Hide this button
+    document.getElementById("CloseButton").className="invisible";
+
+    // Show form
+    document.getElementById("dino-compare").className = "visible";
+}
+
+
+//TODO: Create / implement close button on tiles
+//TODO: Add trivia for dinosaurs
+//TODO: Generate 3 methods to compare dinosaur data with human data
+//TODO: Write logic to render dinosaur trivia

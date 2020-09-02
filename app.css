@@ -172,3 +172,12 @@ select {
     display: block;
     font-size: 0.7em;
 }
+
+/* Dinosaur Project Additions */
+.invisible {
+    display: none;
+}
+
+.visible {
+    display: block;
+}
