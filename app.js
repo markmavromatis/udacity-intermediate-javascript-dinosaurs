@@ -1,86 +1,93 @@
 
 // Create Dino Constructor
-    const tileTypes = ["anklyosaurus", "brachiosaurus", "elasmosaurus", "pteranodon", "human", "tyrannosaurus rex", "stegosaurus", "triceratops", "pigeon"];
+const tileTypes = ["anklyosaurus", "brachiosaurus", "elasmosaurus", "pteranodon", "human", "tyrannosaurus rex", "stegosaurus", "triceratops", "pigeon"];
 
-    let Dinosaur = function(species, weight, height, diet, where, when, fact) {
-        this.species = species;
-        this.weight = weight;
-        this.height = height;
-        this.diet = diet;
-        this.where = where;
-        this.when = when;
-        this.fact = fact;
+// Check form for missing / invalid fields
+function validateFormFields() {
+    const nameField = document.getElementById("name").value;
+
+    if (!nameField) {
+        return "Name is a required field!";
     }
 
-    // Create Dino Objects
-    const dinosData = {};
-    fetch("./dino.json")
-            .then((response) => response.json())
-            .catch((error) => console.error("Error reading dinosaurs file!"))
-            .then((data) => {
-                data.Dinos.forEach((aDino) => {
-                    dinosData[aDino.species.toLowerCase()] = aDino;
-                })
-            })
+    const heightField = document.getElementById("feet").value;
+    if (!heightField) {
+        return "Height is a required field!";
+    } else if (isNaN(heightField)) {
+        return "Height should be a number!";
+    } else if (heightField <= 0) {
+        return "Height should be a number greater than 0!";
+    }
 
+    const heightInchesField = document.getElementById("inches").value;
+    if (!heightInchesField) {
+        // Do nothing. If inches is left blank, assume 0 inches.
+    } else if (isNaN(heightInchesField)) {
+        return "Height (inches) field should be a number!";
+    } else if (heightInchesField < 0 || heightInchesField > 11) {
+        return "Height (inches) field should be a number between 0 and 11!";
+    }
 
-    // Use IIFE to get human data from form
-    const getHumanData = (function() {
-        return function() {
-            const name = document.getElementById("name").value;
-            const heightFeet = document.getElementById("feet").value;
-            let heightInches = document.getElementById("inches").value;
-            if (!heightInches) {heightInches = 0};
-            const weight = document.getElementById("weight").value;
-            return {name: name, heightInches: heightInches + heightFeet * 12, weight: weight}
-        }
-    })()
+    const weightField = document.getElementById("weight").value;
+    if (!weightField) {
+        return "Weight is a required field!";
+    } else if (isNaN(weightField)) {
+        return "Weight field should be a number!";
+    } else if (weightField <= 0) {
+        return "Weight field should be a number greater than 0!";
+    }
 
-    // Create Dino Compare Method 1
-    // NOTE: Weight in JSON file is in lbs, height in inches. 
+    return null;
+}
 
+// let Dinosaur = function(species, weight, height, diet, where, when, fact) {
+//     this.species = species;
+//     this.weight = weight;
+//     this.height = height;
+//     this.diet = diet;
+//     this.where = where;
+//     this.when = when;
+//     this.fact = fact;
+// }
+
+// Load dinosaur objects from JSON file
+const dinosData = {};
+fetch("./dino.json")
+    .then((response) => response.json())
+    .catch((error) => console.error("Error reading dinosaurs file!"))
+    .then((data) => {
+        data.Dinos.forEach((aDino) => {
+            dinosData[aDino.species.toLowerCase()] = aDino;
+        })
+    })
+
+// Use IIFE to retrieve human data from the HTML form
+const getHumanData = (function() {
+    return function() {
+        const name = document.getElementById("name").value;
+        const heightFeet = document.getElementById("feet").value;
+        let heightInches = document.getElementById("inches").value;
+        if (!heightInches) {heightInches = 0};
+        const weight = document.getElementById("weight").value;
+        return {name: name, heightInches: heightInches + heightFeet * 12, weight: weight}
+    }
+})()
     
-    // Create Dino Compare Method 2
-    // NOTE: Weight in JSON file is in lbs, height in inches.
-
-    
-    // Create Dino Compare Method 3
-    // NOTE: Weight in JSON file is in lbs, height in inches.
-
-
     // Generate Tiles for each Dino in Array
   
         // Add tiles to DOM
 
     // Remove form from screen
 
-function getMissingFieldFromForm() {
-    const nameField = document.getElementById("name").value;
-
-    if (!nameField) {
-        return "Name";
-    }
-
-    const heightField = document.getElementById("feet").value;
-    if (!heightField) {
-        return "Height";
-    }
-
-    const weightField = document.getElementById("weight").value;
-    if (!weightField) {
-        return "Weight";
-    }
-    return null;
-}
 
 // On button click, prepare and display infographic
 document.getElementById("btn").onclick = () => {
 
     const errorMessageNode = document.getElementById("formMessage");
     errorMessageNode.innerHTML = ``;
-    const missingField = getMissingFieldFromForm();
-    if (missingField) {
-        errorMessageNode.innerHTML = `${missingField} is required!`;
+    const validationError = validateFormFields();
+    if (validationError) {
+        errorMessageNode.innerHTML = validationError;
         return false;
     }
 
