@@ -1,9 +1,9 @@
 
-// Create Dino Constructor
+// Initialize tile species (in order of display)
 const tileTypes = ["anklyosaurus", "brachiosaurus", "elasmosaurus", "pteranodon", "human", "tyrannosaurus rex", "stegosaurus", "triceratops", "pigeon"];
 
 // Check form for missing / invalid fields
-function validateFormFields() {
+function getFormValidationError() {
     const nameField = document.getElementById("name").value;
 
     if (!nameField) {
@@ -34,16 +34,6 @@ function validateFormFields() {
     return null;
 }
 
-// let Dinosaur = function(species, weight, height, diet, where, when, fact) {
-//     this.species = species;
-//     this.weight = weight;
-//     this.height = height;
-//     this.diet = diet;
-//     this.where = where;
-//     this.when = when;
-//     this.fact = fact;
-// }
-
 // Load dinosaur objects from JSON file
 const dinosData = {};
 fetch("./dino.json")
@@ -66,20 +56,11 @@ const getHumanData = (function() {
         return {name: name, heightInches: heightInches + heightFeet * 12, weight: weight}
     }
 })()
-    
-    // Generate Tiles for each Dino in Array
-  
-        // Add tiles to DOM
 
-    // Remove form from screen
-
-
-// On button click, prepare and display infographic
-document.getElementById("btn").onclick = () => {
-
+function compareButtonClicked() {
     const errorMessageNode = document.getElementById("formMessage");
     errorMessageNode.innerHTML = ``;
-    const validationError = validateFormFields();
+    const validationError = getFormValidationError();
     if (validationError) {
         errorMessageNode.innerHTML = validationError;
         return false;
@@ -89,30 +70,42 @@ document.getElementById("btn").onclick = () => {
 
     document.getElementById("tryAgainBtn").className="inline-block";
 
-    // Hide form
     const gridNode = document.getElementById("grid");
+
+    // Hide form
     document.getElementById("dino-compare").className = "invisible";
+
+    // Render tiles
     tileTypes.forEach((tileType, index) => {
 
+        // Create a new 'div' tile
+        const newDiv = document.createElement("div");
+
+        // Set species field
         const descriptionNode = document.createElement("h3");
         descriptionNode.innerHTML = tileType;
-        const trivia = getTriviaForTile(tileType, formData);
-        const triviaNode = document.createElement("p");
-        triviaNode.innerHTML = trivia;
-        const newDiv = document.createElement("div");
+        newDiv.appendChild(descriptionNode);
+
+
+        // Draw the species image
         newDiv.setAttribute("class", "grid-item");
         const image = document.createElement("img");
         image.setAttribute("src", `images/${tileType}.png`);
-        newDiv.appendChild(descriptionNode);
         newDiv.appendChild(image);
+
+        // Generate trivia from randomized facts
+        const trivia = getTriviaForTile(tileType, formData);
+        const triviaNode = document.createElement("p");
+        triviaNode.innerHTML = trivia;
         newDiv.appendChild(triviaNode);
+
+        // Add the tile to our grid
         gridNode.appendChild(newDiv);
     })
 
 }
 
-
-document.getElementById("tryAgainBtn").onclick = () => {
+function tryAgainButtonClicked() {
 
     // Remove dinosaur tiles
     const gridNode = document.getElementById("grid");
@@ -120,28 +113,33 @@ document.getElementById("tryAgainBtn").onclick = () => {
         gridNode.removeChild(gridNode.childNodes[0]);
     }
 
-    // Hide this button
+    // Hide the "Try Again" button
     document.getElementById("tryAgainBtn").className="invisible";
 
     // Show form
-    document.getElementById("dino-compare").className = "visible";
+    document.getElementById("dino-compare").className = "visible";    
 }
 
+// When "Compare" button is clicked, prepare and display infographic
+document.getElementById("btn").onclick = () => compareButtonClicked()
 
-//TODO: Add trivia for dinosaurs
+// When "Try Again" button clicked, revert to original form
+document.getElementById("tryAgainBtn").onclick =  () => tryAgainButtonClicked()
+
+// Trivia for the tile depends on whether it's a pigeon, human, or dinosaur
 function getTriviaForTile(species, formData) {
     if (species == "pigeon") {
         return "All birds are dinosaurs."
     } else if (species == "human") {
         return formData.name
     } else {
+        // Retrieve a random trivia fact
         return getTriviaForDinosaur(dinosData[species], formData);
     }
 }
 
-//TODO: Generate 3 methods to compare dinosaur data with human data
+// This function retrieves a random dinosaur trivia item
 const getTriviaForDinosaur = function(speciesData, humanData) {
-
 
     function getTimePeriod() {
         return `Lived during the ${speciesData.when} period`;
@@ -192,7 +190,7 @@ const getTriviaForDinosaur = function(speciesData, humanData) {
         }
     }
 
-    // Generate a random fact
+    // Generate a fact based on a random number from 1 to 5
     const factOption = Math.floor(Math.random() * 6);
     switch (factOption) {
         case 0: return getTimePeriod(); break;
@@ -203,5 +201,3 @@ const getTriviaForDinosaur = function(speciesData, humanData) {
         case 5: return compareDiet(); break;
     }
 }
-
-//TODO: Write logic to render dinosaur trivia
