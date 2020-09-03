@@ -12,9 +12,7 @@ function validateFormFields() {
 
     const heightField = document.getElementById("feet").value;
     if (!heightField) {
-        return "Height is a required field!";
-    } else if (isNaN(heightField)) {
-        return "Height should be a number!";
+        return "Height is a required numeric field!";
     } else if (heightField <= 0) {
         return "Height should be a number greater than 0!";
     }
@@ -22,17 +20,13 @@ function validateFormFields() {
     const heightInchesField = document.getElementById("inches").value;
     if (!heightInchesField) {
         // Do nothing. If inches is left blank, assume 0 inches.
-    } else if (isNaN(heightInchesField)) {
-        return "Height (inches) field should be a number!";
     } else if (heightInchesField < 0 || heightInchesField > 11) {
         return "Height (inches) field should be a number between 0 and 11!";
     }
 
     const weightField = document.getElementById("weight").value;
     if (!weightField) {
-        return "Weight is a required field!";
-    } else if (isNaN(weightField)) {
-        return "Weight field should be a number!";
+        return "Weight is a required numeric field!";
     } else if (weightField <= 0) {
         return "Weight field should be a number greater than 0!";
     }
