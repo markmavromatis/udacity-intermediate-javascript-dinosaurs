@@ -2,6 +2,13 @@
 // Initialize tile species (in order of display)
 const tileTypes = ["anklyosaurus", "brachiosaurus", "elasmosaurus", "pteranodon", "human", "tyrannosaurus rex", "stegosaurus", "triceratops", "pigeon"];
 
+// Internally we store dinosaur and human height in inches.
+// This function converts the inches to a more legible feet/inches.
+function convertInchesToFeetInches(inches) {
+    const returnString = parseInt(inches / 12) + "'" + (inches % 12) + "\"";
+    return returnString
+}
+
 // Check form for missing / invalid fields
 function getFormValidationError() {
     const nameField = document.getElementById("name").value;
@@ -53,7 +60,10 @@ const getHumanData = (function() {
         let heightInches = document.getElementById("inches").value;
         if (!heightInches) {heightInches = 0};
         const weight = document.getElementById("weight").value;
-        return {name: name, heightInches: heightInches + heightFeet * 12, weight: weight}
+        console.log("Feet = " + heightFeet);
+        console.log("Inches = " + heightInches);
+        const diet = document.getElementById("diet").value;
+        return {name: name, height: heightInches + heightFeet * 12, weight: weight, diet: diet}
     }
 })()
 
@@ -155,14 +165,16 @@ const getTriviaForDinosaur = function(speciesData, humanData) {
 
     function compareWeight() {
         const humanName = humanData.name;
-        const dinosaurWeight = speciesData.weight
+        const dinosaurWeight = Number(speciesData.weight).toLocaleString();
         const humanWeight = humanData.weight;
         if (dinosaurWeight > humanWeight) {
-            return `This dinosaur was heavier than ${humanName}: ${dinosaurWeight}lbs vs ${humanWeight}lbs`;
+            return `This dinosaur was heavier than ${humanName}: ${dinosaurWeight}lbs ` +
+                `vs ${humanWeight}lbs`;
         } else if (dinosaurWeight == humanWeight) {
             return `This dinosaur weighs the same as ${humanName}! ${dinosaurWeight}lbs`;
         } else {
-            return `This dinosaur weighs LESS than ${humanName}! ${dinosaurWeight}lbs vs ${humanWeight}lbs`;
+            return `This dinosaur weighs LESS than ${humanName}! ${dinosaurWeight}lbs ` +
+                `vs ${humanWeight}lbs`;
         }
     }
 
@@ -171,11 +183,14 @@ const getTriviaForDinosaur = function(speciesData, humanData) {
         const dinosaurHeight = speciesData.height;
         const humanHeight = humanData.height;
         if (dinosaurHeight > humanHeight) {
-            return `This dinosaur was taller than ${humanName}: ${dinosaurHeight} inches vs ${humanHeight} inches`;
+            return `This dinosaur was taller than ${humanName}: ${convertInchesToFeetInches(
+                dinosaurHeight)} inches vs ${convertInchesToFeetInches(humanHeight)} inches`;
         } else if (dinosaurHeight == humanHeight) {
-            return `This dinosaur was the same height as ${humanName}! ${dinosaurHeight} inches`;
+            return `This dinosaur was the same height as ${humanName}! ${convertInchesToFeetInches(
+                dinosaurHeight)} inches`;
         } else {
-            return `This dinosaur was shorter than ${humanName}! ${dinosaurHeight} inches vs ${humanHeight} inches`;
+            return `This dinosaur was shorter than ${humanName}! ${convertInchesToFeetInches(
+                dinosaurHeight)} inches vs ${convertInchesToFeetInches(humanHeight)} inches`;
         }
     }
 
