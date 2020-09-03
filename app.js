@@ -80,7 +80,7 @@ const getTriviaForDinosaur = function(speciesData, humanData) {
 }
 
 // Dinosaur Constructor
-let Dinosaur = function(species, weight, height, diet, where, when, fact) {
+const Dinosaur = function(species, weight, height, diet, where, when, fact) {
     this.species = species;
     this.weight = weight;
     this.height = height;
@@ -107,7 +107,7 @@ Dinosaur.prototype.getTrivia = function(humanData) {
     }
 }
 
-let Human = function(name, height, weight, diet) {
+const Human = function(name, height, weight, diet) {
     this.name = name;
     this.height = height;
     this.weight = weight;
@@ -276,3 +276,4 @@ document.getElementById("btn").onclick = () => compareButtonClicked()
 
 // When "Try Again" button clicked, revert to original form
 document.getElementById("tryAgainBtn").onclick =  () => tryAgainButtonClicked()
+
