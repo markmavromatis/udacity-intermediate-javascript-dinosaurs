@@ -1,13 +1,127 @@
 
-// Initialize tile species (in order of display)
-const tileTypes = ["anklyosaurus", "brachiosaurus", "elasmosaurus", "pteranodon", "human", "tyrannosaurus rex", "stegosaurus", "triceratops", "pigeon"];
-
 // Internally we store dinosaur and human height in inches.
 // This function converts the inches to a more legible feet/inches.
 function convertInchesToFeetInches(inches) {
     const returnString = parseInt(inches / 12) + "'" + (inches % 12) + "\"";
     return returnString
 }
+
+// This function retrieves a random dinosaur trivia item
+const getTriviaForDinosaur = function(speciesData, humanData) {
+
+    function getTimePeriod() {
+        return `Lived during the ${speciesData.when} period`;
+    }
+
+    function getLocation() {
+        return `Lived in the following regions: ${speciesData.where}`;
+    }
+
+    function getFact() {
+        return speciesData.fact;
+    }
+
+    // Compare dinosaur and human weight, return results
+    function compareWeight() {
+        const humanName = humanData.name;
+        const dinosaurWeight = speciesData.weight;
+        const dinosaurWeightFormatted = Number(dinosaurWeight).toLocaleString();
+        const humanWeight = humanData.weight;
+        if (dinosaurWeight > humanWeight) {
+            return `This dinosaur was heavier than ${humanName}: ${dinosaurWeightFormatted}lbs ` +
+                `vs ${humanWeight}lbs`;
+        } else if (dinosaurWeight == humanWeight) {
+            return `This dinosaur weighs the same as ${humanName}! ${dinosaurWeightFormatted}lbs`;
+        } else {
+            return `This dinosaur weighs LESS than ${humanName}! ${dinosaurWeightFormatted}lbs ` +
+                `vs ${humanWeight}lbs`;
+        }
+    }
+
+    // Compare dinosaur and human height, return results
+    function compareHeight() {
+        const humanName = humanData.name;
+        const dinosaurHeight = speciesData.height;
+        const humanHeight = humanData.height;
+        if (dinosaurHeight > humanHeight) {
+            return `This dinosaur was taller than ${humanName}: ${convertInchesToFeetInches(
+                dinosaurHeight)} inches vs ${convertInchesToFeetInches(humanHeight)} inches`;
+        } else if (dinosaurHeight == humanHeight) {
+            return `This dinosaur was the same height as ${humanName}! ${convertInchesToFeetInches(
+                dinosaurHeight)} inches`;
+        } else {
+            return `This dinosaur was shorter than ${humanName}! ${convertInchesToFeetInches(
+                dinosaurHeight)} inches vs ${convertInchesToFeetInches(humanHeight)} inches`;
+        }
+    }
+
+    // Compare dinosaur and human diet, return results
+    function compareDiet() {
+        const humanName = humanData.name;
+        const dinosaurDiet = speciesData.diet
+        const humanDiet = humanData.diet;
+        if (dinosaurDiet == humanDiet) {
+            return `Shared the same diet as ${humanName}`;
+        } else {
+            return `Enjoyed a different diet than ${humanName}! ${dinosaurDiet} vs ${humanDiet}`;
+        }
+    }
+
+    // Generate a fact based on a random number from 1 to 5
+    const factOption = Math.floor(Math.random() * 6);
+    switch (factOption) {
+        case 0: return getTimePeriod(); break;
+        case 1: return getLocation(); break;
+        case 2: return getFact(); break;
+        case 3: return compareWeight(); break;
+        case 4: return compareHeight(); break;
+        case 5: return compareDiet(); break;
+    }
+}
+
+// Dinosaur Constructor
+let Dinosaur = function(species, weight, height, diet, where, when, fact) {
+    this.species = species;
+    this.weight = weight;
+    this.height = height;
+    this.diet = diet;
+    this.where = where;
+    this.when = when;
+    this.fact = fact;
+}
+
+Dinosaur.prototype.getDescription = function() {
+    return this.species;
+}
+
+Dinosaur.prototype.getImageFileName = function() {
+    return this.species;
+}
+
+Dinosaur.prototype.getTrivia = function(humanData) {
+    if (this.species == "Pigeon") {
+        return "All birds are dinosaurs."
+    } else {
+        // Retrieve a random trivia fact
+        return getTriviaForDinosaur(this, humanData);
+    }
+}
+
+let Human = function(name, height, weight, diet) {
+    this.name = name;
+    this.height = height;
+    this.weight = weight;
+    this.diet = diet;
+}
+
+Human.prototype.getDescription = function() {
+    return this.name;
+}
+
+Human.prototype.getImageFileName = function() {
+    return "human";
+}
+
 
 // Check form for missing / invalid fields
 function getFormValidationError() {
@@ -41,33 +155,38 @@ function getFormValidationError() {
     return null;
 }
 
+const dinosaurs = [];
+
 // Load dinosaur objects from JSON file
-const dinosData = {};
 fetch("./dino.json")
     .then((response) => response.json())
     .catch((error) => console.error("Error reading dinosaurs file!"))
     .then((data) => {
         data.Dinos.forEach((aDino) => {
-            dinosData[aDino.species.toLowerCase()] = aDino;
+            dinosaurs.push(new Dinosaur(aDino.species, aDino.weight, aDino.height, aDino.diet,
+                aDino.where, aDino.when, aDino.fact))
         })
     })
 
 // Use IIFE to retrieve human data from the HTML form
-const getHumanData = (function() {
+const convertFormDataToHuman = (function() {
     return function() {
         const name = document.getElementById("name").value;
         const heightFeet = document.getElementById("feet").value;
-        let heightInches = document.getElementById("inches").value;
+        let heightInches = parseInt(document.getElementById("inches").value);
         if (!heightInches) {heightInches = 0};
+        heightInches += heightFeet * 12;
+
         const weight = document.getElementById("weight").value;
-        console.log("Feet = " + heightFeet);
-        console.log("Inches = " + heightInches);
         const diet = document.getElementById("diet").value;
-        return {name: name, height: heightInches + heightFeet * 12, weight: weight, diet: diet}
+        return new Human(name, heightInches, weight, diet);
     }
 })()
 
+// Logic for implementing Compare onClick event
 function compareButtonClicked() {
+
+    // Check form fields for invalid data
     const errorMessageNode = document.getElementById("formMessage");
     errorMessageNode.innerHTML = ``;
     const validationError = getFormValidationError();
@@ -76,42 +195,64 @@ function compareButtonClicked() {
         return false;
     }
 
-    const formData = getHumanData();
-
-    document.getElementById("tryAgainBtn").className="inline-block";
-
-    const gridNode = document.getElementById("grid");
+    // Convert form fields to a Human object
+    const human = convertFormDataToHuman();
 
     // Hide form
     document.getElementById("dino-compare").className = "invisible";
 
     // Render tiles
-    tileTypes.forEach((tileType, index) => {
+    const gridNode = document.getElementById("grid");
+
+    // Create dinosaur count + 1 tiles. Put human tile in the middle.
+    const dinosaurCount = dinosaurs.length;
+    const tileCount = dinosaurCount + 1;
+    // 8 dinosaurs. 9 tiles.
+    // Human is 5th. (index 4 or # dinosaurs / 2)
+    const humanTileIndex = dinosaurCount / 2;
+
+    // Copy array elements from dinosaurs data to tiles data
+    const tileData = [...dinosaurs];
+    // Add the human in the middle
+    tileData.splice(humanTileIndex, 0, human);
+
+    // Now create the tiles with their descriptions, images, and trivia facts.
+    for (let i = 0; i < tileData.length; i++) {
+
+        const thisTile = tileData[i];
 
         // Create a new 'div' tile
         const newDiv = document.createElement("div");
 
-        // Set species field
+        // Set description field
+        const description = thisTile.getDescription();
         const descriptionNode = document.createElement("h3");
-        descriptionNode.innerHTML = tileType;
+        descriptionNode.innerHTML = description;
         newDiv.appendChild(descriptionNode);
-
 
         // Draw the species image
         newDiv.setAttribute("class", "grid-item");
         const image = document.createElement("img");
-        image.setAttribute("src", `images/${tileType}.png`);
+        const imageFileName = thisTile.getImageFileName();
+        image.setAttribute("src", `images/${imageFileName}.png`);
         newDiv.appendChild(image);
 
         // Generate trivia from randomized facts
-        const trivia = getTriviaForTile(tileType, formData);
-        const triviaNode = document.createElement("p");
-        triviaNode.innerHTML = trivia;
-        newDiv.appendChild(triviaNode);
+        if (thisTile instanceof Dinosaur) {
+            const trivia = thisTile.getTrivia(human);
+            const triviaNode = document.createElement("p");
+            triviaNode.innerHTML = trivia;
+            newDiv.appendChild(triviaNode);
+        }
 
         // Add the tile to our grid
         gridNode.appendChild(newDiv);
-    })
+
+    }
+
+    // Show Try Again button
+    document.getElementById("tryAgainBtn").className="inline-block";
+
 
 }
 
@@ -135,84 +276,3 @@ document.getElementById("btn").onclick = () => compareButtonClicked()
 
 // When "Try Again" button clicked, revert to original form
 document.getElementById("tryAgainBtn").onclick =  () => tryAgainButtonClicked()
-
-// Trivia for the tile depends on whether it's a pigeon, human, or dinosaur
-function getTriviaForTile(species, formData) {
-    if (species == "pigeon") {
-        return "All birds are dinosaurs."
-    } else if (species == "human") {
-        return formData.name
-    } else {
-        // Retrieve a random trivia fact
-        return getTriviaForDinosaur(dinosData[species], formData);
-    }
-}
-
-// This function retrieves a random dinosaur trivia item
-const getTriviaForDinosaur = function(speciesData, humanData) {
-
-    function getTimePeriod() {
-        return `Lived during the ${speciesData.when} period`;
-    }
-
-    function getLocation() {
-        return `Lived in the following regions: ${speciesData.where}`;
-    }
-
-    function getFact() {
-        return speciesData.fact;
-    }
-
-    function compareWeight() {
-        const humanName = humanData.name;
-        const dinosaurWeight = Number(speciesData.weight).toLocaleString();
-        const humanWeight = humanData.weight;
-        if (dinosaurWeight > humanWeight) {
-            return `This dinosaur was heavier than ${humanName}: ${dinosaurWeight}lbs ` +
-                `vs ${humanWeight}lbs`;
-        } else if (dinosaurWeight == humanWeight) {
-            return `This dinosaur weighs the same as ${humanName}! ${dinosaurWeight}lbs`;
-        } else {
-            return `This dinosaur weighs LESS than ${humanName}! ${dinosaurWeight}lbs ` +
-                `vs ${humanWeight}lbs`;
-        }
-    }
-
-    function compareHeight() {
-        const humanName = humanData.name;
-        const dinosaurHeight = speciesData.height;
-        const humanHeight = humanData.height;
-        if (dinosaurHeight > humanHeight) {
-            return `This dinosaur was taller than ${humanName}: ${convertInchesToFeetInches(
-                dinosaurHeight)} inches vs ${convertInchesToFeetInches(humanHeight)} inches`;
-        } else if (dinosaurHeight == humanHeight) {
-            return `This dinosaur was the same height as ${humanName}! ${convertInchesToFeetInches(
-                dinosaurHeight)} inches`;
-        } else {
-            return `This dinosaur was shorter than ${humanName}! ${convertInchesToFeetInches(
-                dinosaurHeight)} inches vs ${convertInchesToFeetInches(humanHeight)} inches`;
-        }
-    }
-
-    function compareDiet() {
-        const humanName = humanData.name;
-        const dinosaurDiet = speciesData.diet
-        const humanDiet = humanData.diet;
-        if (dinosaurDiet == humanDiet) {
-            return `Shared the same diet as ${humanName}`;
-        } else {
-            return `Enjoyed a different diet than ${humanName}! ${dinosaurDiet} vs ${humanDiet}`;
-        }
-    }
-
-    // Generate a fact based on a random number from 1 to 5
-    const factOption = Math.floor(Math.random() * 6);
-    switch (factOption) {
-        case 0: return getTimePeriod(); break;
-        case 1: return getLocation(); break;
-        case 2: return getFact(); break;
-        case 3: return compareWeight(); break;
-        case 4: return compareHeight(); break;
-        case 5: return compareDiet(); break;
-    }
-}
